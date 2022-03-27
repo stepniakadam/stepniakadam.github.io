@@ -41,5 +41,4 @@ Write-Host "This is a powershell Code block";
 for (int idx = 0; idx < 10; ++idx) {
 
 }
-
 ```
