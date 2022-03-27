@@ -11,11 +11,15 @@ This is a sample blog post. You can talk about all sorts of fun things here.
 #### Some C++ Code
 
 ```cpp
-Write-Host "This is a powershell Code block";
+// C++ Programming Example No.1
+// ----codescracker.com----
 
-# There are many other languages you can use, but the style has to be loaded first
-
-for (int idx = 0; idx < 10; ++idx) {
-
+#include<iostream>
+using namespace std;
+int main()
+{
+    cout<<"Hello Compiler, I am C++";
+    cout<<endl;
+    return 0;
 }
 ```
