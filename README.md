@@ -1,1 +1,0 @@
-# stepniakadam.github.io
