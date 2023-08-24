@@ -1,30 +1,260 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Posts on Programming blog</title>
-    <link>https://stepniakadam.github.io/posts/</link>
-    <description>Recent content in Posts on Programming blog</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Wed, 16 Nov 2022 18:38:01 +0100</lastBuildDate><atom:link href="https://stepniakadam.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>What are symbols and why they are needed?</title>
-      <link>https://stepniakadam.github.io/posts/mypost3/</link>
-      <pubDate>Wed, 16 Nov 2022 18:38:01 +0100</pubDate>
-      
-      <guid>https://stepniakadam.github.io/posts/mypost3/</guid>
-      <description>&lt;p&gt;In order to fully undestand usage symbols you will need to undestand basics of C++ compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Compilation - programmer perspective</title>
-      <link>https://stepniakadam.github.io/posts/mypost/</link>
-      <pubDate>Sun, 02 Oct 2022 18:13:39 +0200</pubDate>
-      
-      <guid>https://stepniakadam.github.io/posts/mypost/</guid>
-      <description>Maintaining consistent and well organized physical code structure is challanging and underrestimated part of C++ systems development/maintance. Inproper management of interfaces and depenenies will pose maintainablitity and productivity challanges over time. The article aims to summarize simple solutions and attempts to define enforcement rules for best practices.
-Case study Let&amp;rsquo;s assume we are are about to develop small library consumed by many components of the system. Library will communicate with database containing workers entries.</description>
-    </item>
-    
-  </channel>
+    <channel>
+        <title>Posts on Programming blog</title>
+        <link>/posts/</link>
+        <description>Recent content in Posts on Programming blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Wed, 16 Nov 2022 18:38:01 +0100</lastBuildDate><atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>What are symbols and why they are needed?</title>
+        <link>/posts/mypost3/</link>
+        <pubDate>Wed, 16 Nov 2022 18:38:01 +0100</pubDate>
+        
+        <guid>/posts/mypost3/</guid>
+        <description>&lt;p&gt;In order to fully undestand usage symbols you will need to undestand basics of C++ compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.&lt;/p&gt;
+&lt;h3 id=&#34;compilation-steps&#34;&gt;Compilation steps&lt;/h3&gt;
+&lt;p&gt;Compilation will be explained on following &amp;lsquo;Hello World&amp;rsquo; example:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;(){
+   std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;cout &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello world&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;endl;
+   &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Then the following compilation steps are performed:&lt;/p&gt;
+&lt;h4 id=&#34;1-preprocessing&#34;&gt;1. Preprocessing&lt;/h4&gt;
+&lt;p&gt;This is mostly about &lt;strong&gt;copy-pasting text files&lt;/strong&gt; where they were included. Also macro expansion is done and some logic can be applied there, but you should avoid playing with preprocessor as it does not know types. Command used for stopping compilation after preprocessing in gcc is:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;g++ -E main.cpp -o main.i
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;If executed it outputs &lt;strong&gt;32098 lines of iostream + couple of lines of main.cpp&lt;/strong&gt; file.&lt;/p&gt;
+&lt;p&gt;At this point your main.cpp code can be really messed up and you will not see any compiler complaints. No syntax and types checks are performed. You will only know if you mess up syntax around preprocessor macros.&lt;/p&gt;
+&lt;h4 id=&#34;2-translating-into-assembly&#34;&gt;2. Translating into assembly&lt;/h4&gt;
+&lt;p&gt;This step will translate main.i into main.s ASCII assembly file. It is still not undestandable by an operation system, so it cannot be loaded into memory and started. It&amp;rsquo;s just a human-readable &lt;strong&gt;textual representation of assembly code&lt;/strong&gt;. Command used for perform this step is:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;g++ main.i -S -o main.s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;And it ouputs 85 lines of assembly file. There is bunch of code divided by sections and I will not dive deep into it. At this point you have to know that there will be many such files in larger project, so from your perspective is&amp;rsquo;s just a &lt;strong&gt;file containing some chunks of code in ASCII form&lt;/strong&gt;. I&amp;rsquo;m putting bellow couple of lines of the output:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-asm&#34; data-lang=&#34;asm&#34;&gt;.LFB2201:
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_startproc&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;pushq&lt;/span&gt;   %rbp
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_def_cfa_offset&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;16&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_offset&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;, -&lt;span style=&#34;color:#ae81ff&#34;&gt;16&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;movq&lt;/span&gt;    %rsp, %rbp
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_def_cfa_register&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;movl&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;$65535&lt;/span&gt;, %esi
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;movl&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;$1&lt;/span&gt;, %edi
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;call&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;_Z41__static_initialization_and_destruction_0ii&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;popq&lt;/span&gt;    %rbp
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_def_cfa&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;8&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;ret&lt;/span&gt;
+        &lt;span style=&#34;color:#a6e22e&#34;&gt;.cfi_endproc&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;3-translating-into-an-object-file&#34;&gt;3. Translating into an object file&lt;/h4&gt;
+&lt;p&gt;This step result with creating and object file in format allowing to combine many of such files into one executable object. The file is divided into sections with code, data, read-only data, symbol table, debbuging symbols and some others mainly required for relocations during linkage.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;g++ main.s -c -o main.o
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The most interesting part for us at this point is section with symbol table. It can be seen by executing:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;nm -u main.o
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The command will show undefined symbols only and it this case contains&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;_atexit
+                 U __dso_handle
+                 U _ZNSolsEPFRSoS_E
+                 U _ZNSt8ios_base4InitC1Ev
+                 U _ZNSt8ios_base4InitD1Ev
+                 U _ZSt4cout
+                 U _ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_
+                 U _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It is basically a list of symbols that the object knows about (were declared) but has no definiton of. During the linkage it will look for them and properly reallocate code and data. Each symbol outputed above is mangled which means it decorates used name with some more information allowing to uniquely indentify function, structure, class, variable ect. As function can be overloaded then parameters it should contains parameter types. Manging is reversable and can be done in this page: &lt;a class=&#34;link&#34; href=&#34;http://demangler.com/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://demangler.com/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;4-linking-phase&#34;&gt;4. Linking phase&lt;/h4&gt;
+&lt;p&gt;This step will result with an executable file that can be loaded into memory and executed. At this compilation stage there is a set of object files with plenty of undefined symbols, hopefully defined by other objects. But in our case there is only one object file (main.o), right? So why we still need this phase?&lt;/p&gt;
+&lt;p&gt;In fact there are more object existing in the system that compiler already know about. They don&amp;rsquo;t have to be given to it explilicty in linkage command. But we can stil know what linker does for us by using additional flag -v (verbose):&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;g++ -v main.o -o program
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Among other things it outputs gcc options used by compiler and linker:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cfg&#34; data-lang=&#34;cfg&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;COLLECT_GCC_OPTIONS&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;-v&amp;#39; &amp;#39;-o&amp;#39; &amp;#39;program&amp;#39; &amp;#39;-shared-libgcc&amp;#39; &amp;#39;-mtune=generic&amp;#39; &amp;#39;-march=x86-64&amp;#39; &amp;#39;-dumpdir&amp;#39; &amp;#39;program.&amp;#39;
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; /opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/cc8Fkmdb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o program /lib/../lib64/crt1.o /lib/../lib64/crti.o /opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11 -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../.. main.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /lib/../lib64/crtn.o&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;There is list of libraries given as arguments with &amp;lsquo;-l&amp;rsquo; suffix and &lt;code&gt;-lstdc++&lt;/code&gt; among them containing standard library functions definitions. In our example main function uses &lt;code&gt;std::cout&lt;/code&gt; (mangled to &lt;code&gt;_ZSt4cout&lt;/code&gt;) that is not defined in that object file. From that reason &amp;lsquo;nm main.o&amp;rsquo; will returns:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;U _ZSt4cout
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;When the program is linked then definition is provided and symbol is no longer unresolved:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;0000000000404060&lt;/span&gt; B _ZSt4cout@GLIBCXX_3.4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;why-symbols-are-needed-for-linkage&#34;&gt;Why symbols are needed for linkage?&lt;/h3&gt;
+&lt;p&gt;Before linkage there is group of obj files containing &amp;lsquo;references&amp;rsquo; to other objects (Object A may call function defined in Object B, refer to a variable, ect). When code is compiled to assembly&lt;/p&gt;
+&lt;h4 id=&#34;example&#34;&gt;Example:&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;main.cpp:&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;foo&lt;/span&gt;();
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+   foo();
+   &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;Foo.cpp:&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;foo&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt;) {
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+    i&lt;span style=&#34;color:#f92672&#34;&gt;++&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Each file is compiled into a relocatable object file. Main function (from translation unit main.o) calls function &lt;code&gt;foo()&lt;/code&gt; that is defined in other translation unit (Foo.o). When we look at dissassembly of each object the we could see that call to function &lt;code&gt;foo()&lt;/code&gt; does not refer to definition in &lt;code&gt;Foo.o&lt;/code&gt;. Address of the function definition is unknown at compilation time of &lt;code&gt;Main.o&lt;/code&gt;. Starting from address 0x05 there is address of the function &lt;code&gt;foo()&lt;/code&gt; 0x00000000.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;0000000000000000 &amp;lt;main&amp;gt;:
+   0:   55                      push   %rbp
+   1:   48 89 e5                mov    %rsp,%rbp
+   4:   e8 00 00 00 00          call   9 &amp;lt;main+0x9&amp;gt;
+   9:   b8 00 00 00 00          mov    $0x0,%eax
+   e:   5d                      pop    %rbp
+   f:   c3                      ret
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;At this point compiler produces entry in symbol table describing undefined reference by symbol name, type and offset from beggining of the section:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-asm&#34; data-lang=&#34;asm&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;RELOCATION&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;RECORDS&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;FOR&lt;/span&gt; [.&lt;span style=&#34;color:#66d9ef&#34;&gt;text&lt;/span&gt;]:
+&lt;span style=&#34;color:#a6e22e&#34;&gt;OFFSET&lt;/span&gt;           &lt;span style=&#34;color:#66d9ef&#34;&gt;TYPE&lt;/span&gt;              &lt;span style=&#34;color:#66d9ef&#34;&gt;VALUE&lt;/span&gt; 
+&lt;span style=&#34;color:#ae81ff&#34;&gt;0000000000000005&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;R_X86_64_PLT32&lt;/span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;_Z3foov-0x0000000000000004&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;As it starts 5 bytes from the beggining of section text then offset equals 0x05. Undefined symbol will be found by linker in next stage in Foo.o containing full defintion of the function:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;0000000000000000 &amp;lt;_Z3foov&amp;gt;:
+   0:   55                      push   %rbp
+   1:   48 89 e5                mov    %rsp,%rbp
+   4:   8b 05 00 00 00 00       mov    0x0(%rip),%eax        # a &amp;lt;_Z3foov+0xa&amp;gt;
+   a:   83 c0 01                add    $0x1,%eax
+   d:   89 05 00 00 00 00       mov    %eax,0x0(%rip)        # 13 &amp;lt;_Z3foov+0x13&amp;gt;
+  13:   90                      nop
+  14:   5d                      pop    %rbp
+  15:   c3                      ret
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;While combining sections together linker will update addresses to their final values (both intruction addresses and reference values). These will correspond to memory where program will be actuall placed in memory after loading.
+Going back to our example: when binary is linked then call to &lt;code&gt;foo()&lt;/code&gt; references to relative address &lt;code&gt;0x07&lt;/code&gt; containing defintion of the function. &lt;code&gt;.text&lt;/code&gt; sections of 2 different translation units were merged together and their addresses where updated accordingly.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-diff&#34; data-lang=&#34;diff&#34;&gt;0000000000401166 &amp;lt;main&amp;gt;:                                                                            
+  401166:       55                      push   %rbp                                                 
+  401167:       48 89 e5                mov    %rsp,%rbp                                            
+  40116a:       e8 07 00 00 00          call   401176 &amp;lt;_Z3foov&amp;gt;                                     
+  40116f:       b8 00 00 00 00          mov    $0x0,%eax                                            
+  401174:       5d                      pop    %rbp                                                 
+  401175:       c3                      ret                                                         
+                                                                                                    
+0000000000401176 &amp;lt;_Z3foov&amp;gt;:                                                                         
+  401176:       55                      push   %rbp                         
+  401177:       48 89 e5                mov    %rsp,%rbp                                      
+  40117a:       48 8d 05 8f 0e 00 00    lea    0xe8f(%rip),%rax 
+  401181:       48 89 c6                mov    %rax,%rsi                                            
+  401184:       48 8b 05 65 2e 00 00    mov    0x2e65(%rip),%rax                                    
+  40118b:       48 89 c7                mov    %rax,%rdi                                            
+  40118e:       e8 dd fe ff ff          call   
+  401193:       48 8b 15 5e 2e 00 00    mov    0x2e5e(%rip),%rdx 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;shared-libraries&#34;&gt;Shared libraries&lt;/h3&gt;
+&lt;p&gt;If multiple executables are linked against the same static library then copy of the code is present in each of file. It increases space used by executables by the system, but also increases memory memory consuption of loaded programs.&lt;/p&gt;
+&lt;p&gt;Shared libraries address these disadvantages by performing linkage at runtime of the program. Library is loaded into memory and shared among many executables. When executable references symbol defined in such libary the address is unknown until loader does it&amp;rsquo;s job.&lt;/p&gt;</description>
+        </item>
+        <item>
+        <title>Compilation - programmer perspective</title>
+        <link>/posts/mypost/</link>
+        <pubDate>Sun, 02 Oct 2022 18:13:39 +0200</pubDate>
+        
+        <guid>/posts/mypost/</guid>
+        <description>&lt;p&gt;Maintaining consistent and well organized physical code structure is challanging and underrestimated part of C++ systems development/maintance. Inproper management of interfaces and depenenies will pose maintainablitity and productivity challanges over time. The article aims to summarize simple solutions and attempts to define enforcement rules for best practices.&lt;/p&gt;
+&lt;h3 id=&#34;case-study&#34;&gt;Case study&lt;/h3&gt;
+&lt;p&gt;Let&amp;rsquo;s assume we are are about to develop small library consumed by many components of the system. Library will communicate with database containing workers entries. Implementation assumes caching for performace reasons.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution 1 -&lt;/strong&gt; Quick reasearch reveals exising implementation of database connector. Implementing proxy with caching mechanism seems to fullfll all requirements.&lt;/p&gt;
+&lt;p&gt;Possible hpp file:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;vector&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;#34;WorkersDBConnection.hpp&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Workers&lt;/span&gt; {
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+Workers(WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;add&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;remove&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+  std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;vector&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; names;
+  WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;All non-functional requirements would be fulliled by such code but it could be written in a better way.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Challanges:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Library users will indirectly include other headers. Every change in any of depended headers will tigger build and testing pipeline.&lt;/li&gt;
+&lt;li&gt;Library is consumed by many translation units. Each indirectly included header will take part in compilation process slowing it down.&lt;/li&gt;
+&lt;li&gt;Each translation unit will have more declared, but not defined symbols. This will have impact on linkage time.&lt;/li&gt;
+&lt;li&gt;There is limited control over what&amp;rsquo;s included by depended header file (it may be owned by other team)&lt;/li&gt;
+&lt;li&gt;&amp;lsquo;Workers&amp;rsquo; class exposes private implementation details in header file. If implementation changes then all depended translation units have to be recompiled and tested.&lt;/li&gt;
+&lt;li&gt;Unnecessary header dependencies results code growing in each library client&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;first-improvement&#34;&gt;First improvement:&lt;/h3&gt;
+&lt;p&gt;Dependency to &lt;code&gt;WorkersDBConnection&lt;/code&gt; can be removed by technique called: forward-declation. At compilation time only size of declared object is required. As long as there are no direct method calls in header file there is no need for translation units to know any other symbol from that class. As result the pointer to declared type is sufficient. :&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;vector&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;WorkersDBConnection&lt;/span&gt;;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Workers&lt;/span&gt; {
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+Workers(WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;add&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;remove&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+  std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;vector&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; names;
+  WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;GCC has flag &lt;code&gt;-E&lt;/code&gt; allowing stoping compilation after preprocessing phase. Together with &lt;code&gt;wc&lt;/code&gt; tool can roughtly measure impact on number of lines produced by compiler at first phase of compilation.&lt;/p&gt;
+&lt;p&gt;Executing command &lt;strong&gt;before change&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;gcc -E workers.cpp | wc
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&amp;hellip; produces output:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;  36217   78064  892068
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;while executing command &lt;em&gt;&lt;strong&gt;after change&lt;/strong&gt;&lt;/em&gt; produces output:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;26681   57656  658516
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This &lt;strong&gt;one-line change&lt;/strong&gt; excluded from translation unit roughtly &lt;strong&gt;1/3 lines of code&lt;/strong&gt; to process. This may seem as not important, but remember we are developing a library consumed by houndreds/thoudands number of translation units in the system. This may be left in other library in the system that would be also popular and transitively adds &lt;strong&gt;10000 lines&lt;/strong&gt; of code **to each translation unit.&lt;/p&gt;
+&lt;p&gt;What imact it has on comilation time?&lt;/p&gt;
+&lt;p&gt;Before:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;real    0m0.482s
+user    0m0.427s
+sys     0m0.055s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;After:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;real    0m0.376s
+user    0m0.318s
+sys     0m0.058s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;There is &lt;strong&gt;100 [ms] speed up&lt;/strong&gt; on compilation on &lt;strong&gt;each translation unit!&lt;/strong&gt;. This is huge considering thousands of such unit compiled in the whole system! Imagine having 1000x0.1 [s] = 100 [s] speadup on each recompilation by forward declaring dependent type.&lt;/p&gt;
+&lt;h3 id=&#34;second-improvement&#34;&gt;Second improvement:&lt;/h3&gt;
+&lt;p&gt;A header file can be considered as inteface of translation unit - it provides declarations and introduces symbols. Unfortunately declaration of a class in C++ cannot be split into chunks containing public and private members. There is no need for a library class user to know implementation details of prive section of the class. There should be no need for all library clients to need to recompile each translation unit that depends on such header. There is no need for all translation units to compile longer due to header included due to implementation details.&lt;/p&gt;
+&lt;p&gt;In order to mimic C++ inability to understand partialled class declartion we can modify the code in two ways:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Extract pure virtual interface from public methods&lt;/li&gt;
+&lt;li&gt;Use PImpl idiom (pointer to implementation)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Both method solevs all described problems but there is no such thing as free lunch. Extracting pure virtual interface means that vtable will be created for Workers object. Creating anoter indirection is sometimes not an option due performance reasons. Such class cannot be constucted without a factory method returing pointer. This way concrete, inheriting class instance is constructed on heap rather than on stack. And again this approach means performance penaly. Additional indirection means more complicated code as well.&lt;/p&gt;
+&lt;p&gt;Workers.hpp for virtual interface:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#pragma once
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Workers&lt;/span&gt; {
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;virtual&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;Workers(){}
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;virtual&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;add&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name) &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;virtual&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;remove&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name) &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Alternative for this approach is &amp;lsquo;pointer to implementation&amp;rsquo; idiom. It requires creating implementation class called by interface class. This means performance penaly due to indirect calls to implementation and allocation on heap.&lt;/p&gt;
+&lt;p&gt;Worker.hpp for PImpl&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#pragma once
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;WorkersImpl&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;WorkersDBConnection&lt;/span&gt;;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Workers&lt;/span&gt; {
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+Workers(WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;add&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;remove&lt;/span&gt;(&lt;span style=&#34;color:#66d9ef&#34;&gt;const&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string&lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&lt;/span&gt; name);
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;
+  WorkersImpl&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; pImpl;
+  WorkersDBConnection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; connection;
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;What impact such change has on compilation time? Let&amp;rsquo;s put pImpl solution as example (there should be no significant difference between theese two as resulting header is almost the same)&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;real    0m0.324s
+user    0m0.273s
+sys     0m0.051s
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This is not significant, but there was only std::vector dependency removed. Second step (one way or another) in real-life scenario can give incredible improvements in terms of compilation time!.&lt;/p&gt;
+&lt;h3 id=&#34;final-thoughts&#34;&gt;Final thoughts:&lt;/h3&gt;
+&lt;p&gt;A header file is tranlation unit interface and should not be cluttered with unnecessary dependencies. This is extremely important when designing header file that is a library public interface. The article described techniques aiming to resolve related problems, but it&amp;rsquo;s not recommented to apply then everwhere in the code. Gains should allways overweight the cost.&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
 </rss>
