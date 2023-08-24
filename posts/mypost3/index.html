@@ -307,31 +307,53 @@ Going back to our example: when binary is linked then call to <code>foo()</code>
      
     
         
-    <link rel="stylesheet" href="https://unpkg.com/vssue/dist/vssue.min.css" />
+    <script src="https://utteranc.es/client.js" 
+        repo="stepniakadam/blog"
+        issue-term="Comment"
+        
+        label="Vssue Demo"
+        
+        crossorigin="anonymous"
+        async
+        >
+</script>
 
-<div id="vssue"></div>
-
-<script src="https://unpkg.com/vue@2/dist/vue.runtime.min.js"></script>
-<script src="https://unpkg.com/vssue/dist/vssue.github.min.js"></script>
+<style>
+    .utterances {
+        max-width: unset;
+    }
+</style>
 
 <script>
-    new Vue({
-        el: "#vssue",
-        render: (h) =>
-            h("Vssue", {
-                props: {
-                    title: "What are symbols and why they are needed?",
-                    options: {
-                        autoCreateIssue:  true ,
-                        owner: "stepniakadam",
-                        repo: "stepniakadam.github.io",
-                        clientId: "4725869a46e259375608",
-                        clientSecret: "15f4fc9cf2704dfa8706a3402d7217fcfa3ba21c",
-                    },
+    let utterancesLoaded = false;
+
+    function setUtterancesTheme(theme) {
+        let utterances = document.querySelector('.utterances iframe');
+        if (utterances) {
+            utterances.contentWindow.postMessage(
+                {
+                    type: 'set-theme',
+                    theme: `github-${theme}`
                 },
-            }),
+                'https://utteranc.es'
+            );
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://utteranc.es') return;
+
+        
+        utterancesLoaded = true;
+        setUtterancesTheme(document.documentElement.dataset.scheme)
     });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (!utterancesLoaded) return;
+        setUtterancesTheme(e.detail)
+    })
 </script>
+
 
     
 
