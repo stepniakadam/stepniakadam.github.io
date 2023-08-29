@@ -8,10 +8,10 @@
         <language>en-us</language>
         <lastBuildDate>Wed, 16 Nov 2022 18:38:01 +0100</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>What are symbols and why they are needed?</title>
-        <link>/posts/mypost3/</link>
+        <link>/posts/symbols_why_they_are_needed/</link>
         <pubDate>Wed, 16 Nov 2022 18:38:01 +0100</pubDate>
         
-        <guid>/posts/mypost3/</guid>
+        <guid>/posts/symbols_why_they_are_needed/</guid>
         <description>&lt;p&gt;In order to fully undestand usage symbols you will need to undestand basics of C++ compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.&lt;/p&gt;
 &lt;h3 id=&#34;compilation-steps&#34;&gt;Compilation steps&lt;/h3&gt;
 &lt;p&gt;Compilation will be explained on following &amp;lsquo;Hello World&amp;rsquo; example:&lt;/p&gt;
@@ -136,10 +136,10 @@ Going back to our example: when binary is linked then call to &lt;code&gt;foo()&
         </item>
         <item>
         <title>Compilation - programmer perspective</title>
-        <link>/posts/mypost/</link>
+        <link>/posts/compilation_programmers_perspective/</link>
         <pubDate>Sun, 02 Oct 2022 18:13:39 +0200</pubDate>
         
-        <guid>/posts/mypost/</guid>
+        <guid>/posts/compilation_programmers_perspective/</guid>
         <description>&lt;p&gt;Maintaining consistent and well organized physical code structure is challanging and underrestimated part of C++ systems development/maintance. Inproper management of interfaces and depenenies will pose maintainablitity and productivity challanges over time. The article aims to summarize simple solutions and attempts to define enforcement rules for best practices.&lt;/p&gt;
 &lt;h3 id=&#34;case-study&#34;&gt;Case study&lt;/h3&gt;
 &lt;p&gt;Let&amp;rsquo;s assume we are are about to develop small library consumed by many components of the system. Library will communicate with database containing workers entries. Implementation assumes caching for performace reasons.&lt;/p&gt;

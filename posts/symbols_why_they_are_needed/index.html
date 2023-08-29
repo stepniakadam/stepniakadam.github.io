@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='In order to fully undestand usage symbols you will need to undestand basics of C&#43;&#43; compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.
+'>
+<title>What are symbols and why they are needed?</title>
+
+<link rel='canonical' href='/posts/symbols_why_they_are_needed/'>
+
+<link rel="stylesheet" href="/scss/style.min.f2f21d9d961219a01621263328d8997e1ae3b4f0371d455628df1fdc27d57bd6.css"><meta property='og:title' content='What are symbols and why they are needed?'>
+<meta property='og:description' content='In order to fully undestand usage symbols you will need to undestand basics of C&#43;&#43; compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.
+'>
+<meta property='og:url' content='/posts/symbols_why_they_are_needed/'>
+<meta property='og:site_name' content='Notebook'>
+<meta property='og:type' content='article'><meta property='article:section' content='Posts' /><meta property='article:published_time' content='2022-11-16T18:38:01&#43;01:00'/><meta property='article:modified_time' content='2022-11-16T18:38:01&#43;01:00'/>
+<meta name="twitter:title" content="What are symbols and why they are needed?">
+<meta name="twitter:description" content="In order to fully undestand usage symbols you will need to undestand basics of C&#43;&#43; compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.
+">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huda2458f72ce188392d75c5d51cd8e24e_373_300x0_resize_box_3.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Notebook</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/posts/symbols_why_they_are_needed/">What are symbols and why they are needed?</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 16, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    6 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>In order to fully undestand usage symbols you will need to undestand basics of C++ compilation. This article will explain what are symbols in context of compilation by walking you step by step through compilation phases.</p>
+<h3 id="compilation-steps">Compilation steps</h3>
+<p>Compilation will be explained on following &lsquo;Hello World&rsquo; example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(){
+   std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Hello world&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+   <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Then the following compilation steps are performed:</p>
+<h4 id="1-preprocessing">1. Preprocessing</h4>
+<p>This is mostly about <strong>copy-pasting text files</strong> where they were included. Also macro expansion is done and some logic can be applied there, but you should avoid playing with preprocessor as it does not know types. Command used for stopping compilation after preprocessing in gcc is:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">g++ -E main.cpp -o main.i
+</code></pre></div><p>If executed it outputs <strong>32098 lines of iostream + couple of lines of main.cpp</strong> file.</p>
+<p>At this point your main.cpp code can be really messed up and you will not see any compiler complaints. No syntax and types checks are performed. You will only know if you mess up syntax around preprocessor macros.</p>
+<h4 id="2-translating-into-assembly">2. Translating into assembly</h4>
+<p>This step will translate main.i into main.s ASCII assembly file. It is still not undestandable by an operation system, so it cannot be loaded into memory and started. It&rsquo;s just a human-readable <strong>textual representation of assembly code</strong>. Command used for perform this step is:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">g++ main.i -S -o main.s
+</code></pre></div><p>And it ouputs 85 lines of assembly file. There is bunch of code divided by sections and I will not dive deep into it. At this point you have to know that there will be many such files in larger project, so from your perspective is&rsquo;s just a <strong>file containing some chunks of code in ASCII form</strong>. I&rsquo;m putting bellow couple of lines of the output:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">.LFB2201:
+        <span style="color:#a6e22e">.cfi_startproc</span>
+        <span style="color:#a6e22e">pushq</span>   %rbp
+        <span style="color:#a6e22e">.cfi_def_cfa_offset</span> <span style="color:#ae81ff">16</span>
+        <span style="color:#a6e22e">.cfi_offset</span> <span style="color:#ae81ff">6</span>, -<span style="color:#ae81ff">16</span>
+        <span style="color:#a6e22e">movq</span>    %rsp, %rbp
+        <span style="color:#a6e22e">.cfi_def_cfa_register</span> <span style="color:#ae81ff">6</span>
+        <span style="color:#a6e22e">movl</span>    <span style="color:#66d9ef">$65535</span>, %esi
+        <span style="color:#a6e22e">movl</span>    <span style="color:#66d9ef">$1</span>, %edi
+        <span style="color:#a6e22e">call</span>    <span style="color:#66d9ef">_Z41__static_initialization_and_destruction_0ii</span>
+        <span style="color:#a6e22e">popq</span>    %rbp
+        <span style="color:#a6e22e">.cfi_def_cfa</span> <span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>
+        <span style="color:#a6e22e">ret</span>
+        <span style="color:#a6e22e">.cfi_endproc</span>
+
+</code></pre></div><h4 id="3-translating-into-an-object-file">3. Translating into an object file</h4>
+<p>This step result with creating and object file in format allowing to combine many of such files into one executable object. The file is divided into sections with code, data, read-only data, symbol table, debbuging symbols and some others mainly required for relocations during linkage.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">g++ main.s -c -o main.o
+</code></pre></div><p>The most interesting part for us at this point is section with symbol table. It can be seen by executing:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">nm -u main.o
+</code></pre></div><p>The command will show undefined symbols only and it this case contains</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">_atexit
+                 U __dso_handle
+                 U _ZNSolsEPFRSoS_E
+                 U _ZNSt8ios_base4InitC1Ev
+                 U _ZNSt8ios_base4InitD1Ev
+                 U _ZSt4cout
+                 U _ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_
+                 U _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc
+</code></pre></div><p>It is basically a list of symbols that the object knows about (were declared) but has no definiton of. During the linkage it will look for them and properly reallocate code and data. Each symbol outputed above is mangled which means it decorates used name with some more information allowing to uniquely indentify function, structure, class, variable ect. As function can be overloaded then parameters it should contains parameter types. Manging is reversable and can be done in this page: <a class="link" href="http://demangler.com/"  target="_blank" rel="noopener"
+    >http://demangler.com/</a></p>
+<h4 id="4-linking-phase">4. Linking phase</h4>
+<p>This step will result with an executable file that can be loaded into memory and executed. At this compilation stage there is a set of object files with plenty of undefined symbols, hopefully defined by other objects. But in our case there is only one object file (main.o), right? So why we still need this phase?</p>
+<p>In fact there are more object existing in the system that compiler already know about. They don&rsquo;t have to be given to it explilicty in linkage command. But we can stil know what linker does for us by using additional flag -v (verbose):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">g++ -v main.o -o program
+</code></pre></div><p>Among other things it outputs gcc options used by compiler and linker:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cfg" data-lang="cfg"><span style="color:#a6e22e">COLLECT_GCC_OPTIONS</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;-v&#39; &#39;-o&#39; &#39;program&#39; &#39;-shared-libgcc&#39; &#39;-mtune=generic&#39; &#39;-march=x86-64&#39; &#39;-dumpdir&#39; &#39;program.&#39;
+</span><span style="color:#e6db74"> /opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/collect2 -plugin /opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/liblto_plugin.so -plugin-opt=/opt/rh/devtoolset-11/root/usr/libexec/gcc/x86_64-redhat-linux/11/lto-wrapper -plugin-opt=-fresolution=/tmp/cc8Fkmdb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --no-add-needed --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o program /lib/../lib64/crt1.o /lib/../lib64/crti.o /opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/crtbegin.o -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11 -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/../../.. main.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/crtend.o /lib/../lib64/crtn.o</span>
+</code></pre></div><p>There is list of libraries given as arguments with &lsquo;-l&rsquo; suffix and <code>-lstdc++</code> among them containing standard library functions definitions. In our example main function uses <code>std::cout</code> (mangled to <code>_ZSt4cout</code>) that is not defined in that object file. From that reason &lsquo;nm main.o&rsquo; will returns:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">U _ZSt4cout
+</code></pre></div><p>When the program is linked then definition is provided and symbol is no longer unresolved:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#ae81ff">0000000000404060</span> B _ZSt4cout@GLIBCXX_3.4
+</code></pre></div><h3 id="why-symbols-are-needed-for-linkage">Why symbols are needed for linkage?</h3>
+<p>Before linkage there is group of obj files containing &lsquo;references&rsquo; to other objects (Object A may call function defined in Object B, refer to a variable, ect). When code is compiled to assembly</p>
+<h4 id="example">Example:</h4>
+<p><code>main.cpp:</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">foo</span>();
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+   foo();
+   <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+</code></pre></div><p><code>Foo.cpp:</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">foo</span>(<span style="color:#66d9ef">void</span>) {
+    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    i<span style="color:#f92672">++</span>;
+}
+</code></pre></div><p>Each file is compiled into a relocatable object file. Main function (from translation unit main.o) calls function <code>foo()</code> that is defined in other translation unit (Foo.o). When we look at dissassembly of each object the we could see that call to function <code>foo()</code> does not refer to definition in <code>Foo.o</code>. Address of the function definition is unknown at compilation time of <code>Main.o</code>. Starting from address 0x05 there is address of the function <code>foo()</code> 0x00000000.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">0000000000000000 &lt;main&gt;:
+   0:   55                      push   %rbp
+   1:   48 89 e5                mov    %rsp,%rbp
+   4:   e8 00 00 00 00          call   9 &lt;main+0x9&gt;
+   9:   b8 00 00 00 00          mov    $0x0,%eax
+   e:   5d                      pop    %rbp
+   f:   c3                      ret
+</code></pre></div><p>At this point compiler produces entry in symbol table describing undefined reference by symbol name, type and offset from beggining of the section:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm"><span style="color:#a6e22e">RELOCATION</span> <span style="color:#66d9ef">RECORDS</span> <span style="color:#66d9ef">FOR</span> [.<span style="color:#66d9ef">text</span>]:
+<span style="color:#a6e22e">OFFSET</span>           <span style="color:#66d9ef">TYPE</span>              <span style="color:#66d9ef">VALUE</span> 
+<span style="color:#ae81ff">0000000000000005</span> <span style="color:#66d9ef">R_X86_64_PLT32</span>    <span style="color:#66d9ef">_Z3foov-0x0000000000000004</span>
+</code></pre></div><p>As it starts 5 bytes from the beggining of section text then offset equals 0x05. Undefined symbol will be found by linker in next stage in Foo.o containing full defintion of the function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">0000000000000000 &lt;_Z3foov&gt;:
+   0:   55                      push   %rbp
+   1:   48 89 e5                mov    %rsp,%rbp
+   4:   8b 05 00 00 00 00       mov    0x0(%rip),%eax        # a &lt;_Z3foov+0xa&gt;
+   a:   83 c0 01                add    $0x1,%eax
+   d:   89 05 00 00 00 00       mov    %eax,0x0(%rip)        # 13 &lt;_Z3foov+0x13&gt;
+  13:   90                      nop
+  14:   5d                      pop    %rbp
+  15:   c3                      ret
+</code></pre></div><p>While combining sections together linker will update addresses to their final values (both intruction addresses and reference values). These will correspond to memory where program will be actuall placed in memory after loading.
+Going back to our example: when binary is linked then call to <code>foo()</code> references to relative address <code>0x07</code> containing defintion of the function. <code>.text</code> sections of 2 different translation units were merged together and their addresses where updated accordingly.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">0000000000401166 &lt;main&gt;:                                                                            
+  401166:       55                      push   %rbp                                                 
+  401167:       48 89 e5                mov    %rsp,%rbp                                            
+  40116a:       e8 07 00 00 00          call   401176 &lt;_Z3foov&gt;                                     
+  40116f:       b8 00 00 00 00          mov    $0x0,%eax                                            
+  401174:       5d                      pop    %rbp                                                 
+  401175:       c3                      ret                                                         
+                                                                                                    
+0000000000401176 &lt;_Z3foov&gt;:                                                                         
+  401176:       55                      push   %rbp                         
+  401177:       48 89 e5                mov    %rsp,%rbp                                      
+  40117a:       48 8d 05 8f 0e 00 00    lea    0xe8f(%rip),%rax 
+  401181:       48 89 c6                mov    %rax,%rsi                                            
+  401184:       48 8b 05 65 2e 00 00    mov    0x2e65(%rip),%rax                                    
+  40118b:       48 89 c7                mov    %rax,%rdi                                            
+  40118e:       e8 dd fe ff ff          call   
+  401193:       48 8b 15 5e 2e 00 00    mov    0x2e5e(%rip),%rdx 
+</code></pre></div><h3 id="shared-libraries">Shared libraries</h3>
+<p>If multiple executables are linked against the same static library then copy of the code is present in each of file. It increases space used by executables by the system, but also increases memory memory consuption of loaded programs.</p>
+<p>Shared libraries address these disadvantages by performing linkage at runtime of the program. Library is loaded into memory and shared among many executables. When executable references symbol defined in such libary the address is unknown until loader does it&rsquo;s job.</p>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <script src="https://utteranc.es/client.js" 
+        repo="stepniakadam/blog"
+        issue-term="Comment"
+        
+        label="Vssue"
+        
+        crossorigin="anonymous"
+        async
+        >
+</script>
+
+<style>
+    .utterances {
+        max-width: unset;
+    }
+</style>
+
+<script>
+    let utterancesLoaded = false;
+
+    function setUtterancesTheme(theme) {
+        let utterances = document.querySelector('.utterances iframe');
+        if (utterances) {
+            utterances.contentWindow.postMessage(
+                {
+                    type: 'set-theme',
+                    theme: `github-${theme}`
+                },
+                'https://utteranc.es'
+            );
+        }
+    }
+
+    addEventListener('message', event => {
+        if (event.origin !== 'https://utteranc.es') return;
+
+        
+        utterancesLoaded = true;
+        setUtterancesTheme(document.documentElement.dataset.scheme)
+    });
+
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (!utterancesLoaded) return;
+        setUtterancesTheme(e.detail)
+    })
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 Notebook
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.18.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
