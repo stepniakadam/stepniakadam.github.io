@@ -6,7 +6,118 @@
         <description>Recent content on Notebook</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Wed, 16 Nov 2022 18:38:01 +0100</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 14 Sep 2023 18:43:19 +0100</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Modules - overview</title>
+        <link>/posts/modules_quick_start/</link>
+        <pubDate>Thu, 14 Sep 2023 18:43:19 +0100</pubDate>
+        
+        <guid>/posts/modules_quick_start/</guid>
+        <description>&lt;p&gt;Compilation of a large C++ project can be terribly slow when the project is not structured correctly - structured in a way in fact mimicking modules. Unfortunately this requires deep understanding of linkage and compilation process. These are not most popular and essential parts of the language and as a result are quite often ignored and forgotten. Consequently, projects have tendencies to diverge from optimal structure in terms of compilation speed. The default and the easiest option should be the most efficient, but it&amp;rsquo;s opposite.&lt;/p&gt;
+&lt;h3 id=&#34;how-modules-affect-linkage&#34;&gt;How modules affect linkage?&lt;/h3&gt;
+&lt;p&gt;Modules introduce new term: &lt;strong&gt;module linkage&lt;/strong&gt; along with existing external and internal linkages: &amp;ldquo;The name can be referred to only from the scopes in the same module unit or in the other translation units of the same named module.&amp;rdquo; - en.cppreference.com.&lt;/p&gt;
+&lt;p&gt;A translation unit is a subset of module unit - multiple translation unit can form one module unit. Translation unit used to be self-contained. All symbols required for compilation had to be declared through included header files. Modules aim to eliminated separate files for providing symbols. How compiler can validate presence of the &lt;strong&gt;Module linkage function&lt;/strong&gt; (see picture below) in the &lt;strong&gt;Module unit 1&lt;/strong&gt;? During compilation of &lt;strong&gt;Translation unit B&lt;/strong&gt; (client to module linkage function contained in &lt;strong&gt;Translation unit A&lt;/strong&gt;) it is required to validate if used symbol exists and makes sense.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/modules_quick_start/modules.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Modules&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;What&amp;rsquo;s more - a function defined in &lt;strong&gt;Translation unit A&lt;/strong&gt; happens to have the same signature as function defined in &lt;strong&gt;Translation unit C&lt;/strong&gt;. Which function should linker pick when resolving unresolved symbol encountered in &lt;strong&gt;Translation unit B&lt;/strong&gt;? GCC would use first symbol encountered, and it might be ODR violation. Modules however introduce &lt;strong&gt;module linkage&lt;/strong&gt; and the same can be referenced to only from the scopes in the same module unit.&lt;/p&gt;
+&lt;p&gt;We defined following implementation challenges so far:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Symbols from other modules should be accessible during compilation phase&lt;/li&gt;
+&lt;li&gt;There should be no collisions for the same functions define in different module (with module linkage)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Standard does not impose any implementation way so let&amp;rsquo;s examine GCC only. They introduced separate artifacts when compiled named module interfaces, partitions or header units that are read when importing. At moment of writing this article there are no tools available for inspecting content of such artifacts and documentation is lack of details. This is however logical place to put all metadata required to solve &lt;strong&gt;problem 1&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Linker does not change on each cpp standard update - it barely knows about c++ standard. Linker knows about executable format at specific platform. It knows what are sections and segments and how to update references in compiled assembly to other assembly in other translation unit. Modules are not implemented in linker - the different is how linker sees function with the same signature defined in different translation units.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/modules_quick_start/modulesLinking.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Modules&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Symbol &lt;code&gt;_ZW11moduleUnit13foov&lt;/code&gt; from module 1 is different from symbol &lt;code&gt;_ZW11moduleUnit23foov&lt;/code&gt; in module 2, even through function signature is the same. This ensures that it is not possible to link against symbol defined in other module, but it is perfectly fine to link against such symbol defined in the same module but in other translation unit (module partitions).&lt;/p&gt;
+&lt;h3 id=&#34;macros-and-defines-are-separated&#34;&gt;Macros and defines are separated&lt;/h3&gt;
+&lt;p&gt;Preprocessor does not only textually copy-paste a code but also decides which section of text should be skipped based on combination of &lt;code&gt;#defines&lt;/code&gt; and &lt;code&gt;#ifdefs&lt;/code&gt;. It does not know C++ syntax - is unaware about classes and variables. Everything from its perspective is just a text.&lt;/p&gt;
+&lt;p&gt;Heavy reliance on macros is highly discouraged but the fact is that still large codebases are highly depended on them. Sometimes using preprocessor is the only elegant way to solve a problem (serializing and deserializing libraries without reflection). Sometimes programmers are used to solve problems in certain ways and don&amp;rsquo;t update knowledge about best practices. There are many reasons why preprocessor usage is not and will not be deprecated soon.&lt;/p&gt;
+&lt;p&gt;At this point modules aim to limit macros related challenges by separation. According to proposal: &amp;ldquo;macros and preprocessor directives in a module unit should have no effect on the
+translation units that import it.&amp;rdquo;. It basically eliminates possibility of sneaky errors as result of &lt;code&gt;#include&lt;/code&gt; ordering.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/modules_quick_start/modulesDefines.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Modules&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;templates&#34;&gt;Templates&lt;/h3&gt;
+&lt;p&gt;Templates in standard inclusion model by default result with duplication of definitions across translation units. Every time a file template defined in an include file is copy-pasted into a translation unit following chunk of code is copy-pasted into resulting object file. Modules does not change that behaviour but give more clear semantic way of expressing implicit instantiation of a template.&lt;/p&gt;
+&lt;p&gt;For C++11 the only way to avoid copy-pasting template code into multiple translation unit was to implicitly defined then in one translation unit and extern that definition in header file:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;template&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; execute() {}
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;template&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; execute&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;();
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;then the template is explicitly instantiate in corresponding cpp file:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;template&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; execute&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;();
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;it results with having a translation unit with assembly code that other translation units can refer to. The reference is resolved during the linkage.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/posts/modules_quick_start/templates.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;Modules&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Executor.hpp defines template body and provides a symbol for a specialised version of the template. Corresponding cpp file contains specialization definition and as a result translation unit will contain assembly code for &lt;code&gt;execute&amp;lt;int&amp;gt;()&lt;/code&gt; function. If any other translation unit refer to this version of template it will not contain its own version of assembly code because inclusion of executor.hpp file will tell compiler that this symbol is declared here and defined somewhere else (extern). Reference to the symbol will be updated during linkage.&lt;/p&gt;
+&lt;p&gt;Modules provide similar functionality, but in my opinion with much nicer syntax:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;export&lt;/span&gt; {
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;template&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; execute() {}
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;template&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; execute&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;();
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The syntax above provides a way to tell other modules what is available to them:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;There is a template that can be specialised in any importing translation unit. In such case importing unit will have its own copy of assembly code.&lt;/li&gt;
+&lt;li&gt;There is exported function &lt;code&gt;execute&amp;lt;int&amp;gt;()&lt;/code&gt; that is defined in module unit and resulting translation unit. Importing translation units will not have their own copy of assembly code.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;reachability-vs-visibility&#34;&gt;Reachability vs visibility&lt;/h3&gt;
+&lt;p&gt;Modules give a programmer correct and efficient way of defining public interface by default. It means you would have to work hard in order to mimic inefficiency of header files.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s consider following example of a library animal:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;module;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;string&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;export&lt;/span&gt; module animal;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;export&lt;/span&gt; std&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;string makeSound() {
+ &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Sound&amp;#34;&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Client code does not have to be aware of all symbols in std::string in order to fully use the code. There is a notion of &amp;lsquo;reachability&amp;rsquo; vs &amp;lsquo;visibility&amp;rsquo;. In this case std::string is not visible by client code but is reachable.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;import animal;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;() {
+ &lt;span style=&#34;color:#66d9ef&#34;&gt;auto&lt;/span&gt; s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; makeSound();
+ printf(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;%s&amp;#34;&lt;/span&gt;, s.c_str()); &lt;span style=&#34;color:#75715e&#34;&gt;// .c_str() of std::string is reachable but not visible
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;// std::string text; // will not compile  unless #include &amp;lt;string&amp;gt; is added
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The example above shows IMHO the most important aspect of modules - efficiency by default. Only exported symbols are visible to a client module. By no means am I saying that it&amp;rsquo;s good practice to provide a library that is not self-sufficient - requiring doing more than just &amp;lsquo;import&amp;rsquo; to fully use their API. But this has to be done consciously by explicitly exporting what is needed. It helps to avoid accidental &lt;code&gt;#include&lt;/code&gt; bloat!&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>What are symbols and why they are needed?</title>
         <link>/posts/symbols_why_they_are_needed/</link>
         <pubDate>Wed, 16 Nov 2022 18:38:01 +0100</pubDate>
